@@ -17,10 +17,10 @@ Permite:
 
 ## 🧩 Estructura del proyecto
 
-📁 HomeOffice-Checklist
-├── checklist-otd.html # Interfaz principal (web)
-├── Recopilar-DatosEquipo.ps1 # Script de recolección automática
-└── README.md
+-📁 HomeOffice-Checklist
+- checklist-otd.html # Interfaz principal (web)
+- Recopilar-DatosEquipo.ps1 # Script de recolección automática
+- README.md
 
 ---
 
