@@ -82,7 +82,8 @@ GENERAR REPORTE PDF
 Si tienes restricciones, el lanzador usa:
 
 ```powershell
-ExecutionPolicy Bypass
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+
 🐛 Problemas conocidos
 Error con [datetime]::TryParse
 
