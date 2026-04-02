@@ -156,7 +156,20 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
         <div class="field"><label>Procesador</label><input type="text" id="procesador" readonly/></div>
         <div class="field"><label>Núcleos / Hilos</label><input type="text" id="nucleos" readonly/></div>
         <div class="field"><label>RAM</label><input type="text" id="ram" readonly/></div>
+        <div class="field"><label>Tipo de RAM</label><input type="text" id="ramTipo" readonly/></div>
+        <div class="field"><label>Frecuencia de RAM</label><input type="text" id="ramFrecuencia" readonly/></div>
         <div class="field"><label>BIOS (Versión / Fecha)</label><input type="text" id="bios" readonly/></div>
+      </div>
+
+      <hr/>
+
+      <span class="lbl-sub">Almacenamiento</span>
+      <p class="note">Discos físicos detectados en el equipo.</p>
+      <div style="border:1px solid #e0e0e0; margin-bottom:14px;">
+        <table>
+          <thead><tr><th>Modelo</th><th>Tipo</th><th>Capacidad</th><th>Estado</th></tr></thead>
+          <tbody id="tbody-discos"><tr><td colspan="4" style="color:#aaa;">Sin datos cargados</td></tr></tbody>
+        </table>
       </div>
 
       <hr/>
@@ -169,6 +182,15 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
             <button onclick="pick('winUpdate',this,'Pendiente')">Pendiente</button>
             <button onclick="pick('winUpdate',this,'No revisado')">No revisado</button>
           </div>
+        </div>
+      </div>
+
+      <hr/>
+
+      <div style="margin-bottom:14px;">
+        <div class="field">
+          <label>Licencia de Windows</label>
+          <div id="win-licencia-display" class="ping-display" style="display:inline-block;padding:8px 14px;border:1.5px solid #ddd;background:#fafafa;font-size:13px;margin-top:6px;">Sin datos</div>
         </div>
       </div>
 
@@ -216,6 +238,16 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
           <tbody id="tbody-drivers"><tr><td colspan="3" style="color:#aaa;">Sin datos cargados</td></tr></tbody>
         </table>
       </div>
+      <div style="margin-bottom:14px;">
+        <div class="field">
+          <label>¿Cumple con los drivers requeridos?</label>
+          <div class="radios" id="radios-driversCumple">
+            <button onclick="pick('driversCumple',this,'Sí')">Sí</button>
+            <button onclick="pick('driversCumple',this,'No')">No</button>
+            <button onclick="pick('driversCumple',this,'Parcialmente')">Parcialmente</button>
+          </div>
+        </div>
+      </div>
       <div class="field">
         <label>Observaciones de drivers</label>
         <textarea id="obs-drivers" placeholder="Ej: driver de video desactualizado, falta driver de audio..."></textarea>
@@ -227,6 +259,24 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
   <div class="section">
     <div class="section-title">3. Verificación Física de Periféricos</div>
     <div class="section-body">
+
+      <span class="lbl-sub">Limpieza y Estado Físico del Equipo</span>
+      <div style="margin-bottom:16px; padding:14px; background:#fafafa; border:1px solid #e0e0e0;">
+        <div class="field" style="margin-bottom:10px;">
+          <label>¿El equipo está limpio internamente?</label>
+          <div class="radios" id="radios-limpiezaInterna">
+            <button onclick="pick('limpiezaInterna',this,'Sí')">Sí</button>
+            <button onclick="pick('limpiezaInterna',this,'No — Requiere limpieza')">No — Requiere limpieza</button>
+            <button onclick="pick('limpiezaInterna',this,'No aplica')">No aplica</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Observaciones de limpieza</label>
+          <textarea id="obs-limpieza" placeholder="Ej: polvo acumulado en ventiladores, pasta térmica deteriorada..." style="min-height:50px;"></textarea>
+        </div>
+      </div>
+
+      <hr/>
       <span class="lbl-sub">Periféricos</span>
       <table id="tbl-perifericos" style="margin-bottom:16px;">
         <thead><tr><th>Periférico</th><th>¿Funciona?</th><th>Observación</th></tr></thead>
@@ -259,6 +309,29 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
     </div>
   </div>
 
+  <!-- 5. INFORMACIÓN DE ENTREGA Y FIRMAS -->
+  <div class="section">
+    <div class="section-title">5. Información de Entrega y Firmas</div>
+    <div class="section-body">
+      <p class="note" style="margin-bottom:16px;">Complete los datos antes de generar el PDF. Los campos con información aparecerán impresos; los vacíos quedarán como líneas para firma manual.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;">
+        <div>
+          <span class="lbl-sub">Colaborador Receptor</span>
+          <div class="field" style="margin-bottom:10px;"><label>Nombre completo</label><input type="text" id="colNombre" placeholder="Nombre del colaborador"/></div>
+          <div class="field" style="margin-bottom:10px;"><label>Cédula</label><input type="text" id="colCedula" placeholder="Número de cédula"/></div>
+          <div class="field" style="margin-bottom:10px;"><label>Cargo</label><input type="text" id="colCargo" placeholder="Cargo o posición"/></div>
+          <div class="field" style="margin-bottom:10px;"><label>Teléfono</label><input type="text" id="colTelefono" placeholder="Teléfono de contacto"/></div>
+          <div class="field"><label>Campaña / Área</label><input type="text" id="colCampana" placeholder="Campaña o área asignada"/></div>
+        </div>
+        <div>
+          <span class="lbl-sub">Técnico Responsable</span>
+          <div class="field" style="margin-bottom:10px;"><label>Nombre completo</label><input type="text" id="tecNombre" placeholder="Nombre del técnico"/></div>
+          <div class="field"><label>Cargo</label><input type="text" id="tecCargo" placeholder="Cargo o posición"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <button id="btn-pdf" onclick="generarPDF()">GENERAR REPORTE PDF</button>
 
 </div>
@@ -269,12 +342,16 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
 const S = {
   hostname:'', fecha: new Date().toISOString().slice(0,10),
   marca:'', modelo:'', serialNumber:'', osVersion:'', winRelease:'',
-  procesador:'', nucleos:'', ram:'', bios:'',
-  winUpdate:'', appsCumple:'',
+  procesador:'', nucleos:'', ram:'', ramTipo:'', ramFrecuencia:'', bios:'',
+  winUpdate:'', appsCumple:'', driversCumple:'', winLicencia:'', winLicenciaTipo:'', winLicenciaCanal:'',
+  discos:[],
   programas:[], drivers:[], tarjetasRed:[],
   pingResultado:'', pingMs:0, pingPerdida:0,
   perifericos:{}, cables:{},
-  obsApps:'', obsDrivers:''
+  limpiezaInterna:'', obsLimpieza:'',
+  obsApps:'', obsDrivers:'',
+  colNombre:'', colCedula:'', colCargo:'', colTelefono:'', colCampana:'',
+  tecNombre:'', tecCargo:''
 };
 
 const PERIFERICOS = [
@@ -302,6 +379,12 @@ window.onload = () => {
   document.getElementById('fecha').addEventListener('change', e => S.fecha = e.target.value);
   document.getElementById('obs-apps').addEventListener('input',    e => S.obsApps    = e.target.value);
   document.getElementById('obs-drivers').addEventListener('input', e => S.obsDrivers = e.target.value);
+  document.getElementById('obs-limpieza').addEventListener('input', e => S.obsLimpieza = e.target.value);
+
+  ['colNombre','colCedula','colCargo','colTelefono','colCampana','tecNombre','tecCargo'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', function(e) { S[id] = e.target.value; });
+  });
 
   PERIFERICOS.forEach(p => { S.perifericos[p.key] = { funciona:'', obs:'' }; });
   CABLES.forEach(c => { S.cables[c.key] = { tipo:'', tiene:'', funciona:'' }; });
@@ -360,6 +443,29 @@ function importJSON(text, fname) {
     setF('procesador',   d.procesador   || '');
     setF('nucleos',      d.nucleos      || '');
     setF('ram',          d.ram          || '');
+    setF('ramTipo',      d.ramTipo      || '');
+    setF('ramFrecuencia',d.ramFrecuencia|| '');
+
+    if (Array.isArray(d.discos)) {
+      S.discos = d.discos;
+      const tbody = document.getElementById('tbody-discos');
+      if (d.discos.length > 0) {
+        tbody.innerHTML = d.discos.map(function(dk) {
+          const tipo = dk.tipo || '';
+          const badge = tipo.includes('NVMe') ? 'background:#e8f0fe;color:#1a56db;' :
+                        tipo.includes('SSD')  ? 'background:#e6f9ed;color:#0a6b2e;' :
+                        tipo.includes('HDD')  ? 'background:#fff3e0;color:#b45309;' : '';
+          return '<tr>' +
+            '<td>' + esc(dk.modelo||'') + '</td>' +
+            '<td><span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;' + badge + '">' + esc(tipo) + '</span></td>' +
+            '<td>' + esc(dk.capacidad||'') + '</td>' +
+            '<td>' + esc(dk.estado||'') + '</td>' +
+            '</tr>';
+        }).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;">Sin discos detectados</td></tr>';
+      }
+    }
 
     const bv = (d.biosVersion || '').trim();
     const bd = (d.biosDate    || '').trim();
@@ -407,6 +513,19 @@ function importJSON(text, fname) {
                 : 'No revisado';
       S.winUpdate = val;
       autoMark('radios-winUpdate', val);
+    }
+
+    // Licencia de Windows
+    if (d.winLicencia) {
+      S.winLicencia      = d.winLicencia;
+      S.winLicenciaTipo  = d.winLicenciaTipo  || '';
+      S.winLicenciaCanal = d.winLicenciaCanal || '';
+      const licEl = document.getElementById('win-licencia-display');
+      if (licEl) {
+        const activa = d.winLicencia === 'Activa';
+        licEl.textContent = d.winLicencia + (d.winLicenciaCanal ? ' — ' + d.winLicenciaCanal : '') + (d.winLicenciaTipo ? ' (' + d.winLicenciaTipo + ')' : '');
+        licEl.className = 'ping-display ' + (activa ? 'ok' : 'fail');
+      }
     }
 
     document.getElementById('import-status').textContent = '✓ ' + fname;
@@ -592,11 +711,28 @@ function generarPDF() {
       ['Procesador',             gv('procesador')],
       ['Núcleos / Hilos',        gv('nucleos')],
       ['RAM',                    gv('ram')],
+      ['Tipo de RAM',            gv('ramTipo')],
+      ['Frecuencia de RAM',      gv('ramFrecuencia')],
       ['BIOS (Versión / Fecha)', gv('bios')],
       ['Windows Update',         S.winUpdate || '—'],
+      ['Licencia Windows',        S.winLicencia ? (S.winLicencia + (S.winLicenciaCanal ? ' — ' + S.winLicenciaCanal : '') + (S.winLicenciaTipo ? ' (' + S.winLicenciaTipo + ')' : '')) : '—'],
     ],
     { 0:{ cellWidth:60, fontStyle:'bold' } }
   );
+
+  // Discos
+  secHeader('Almacenamiento');
+  if (S.discos && S.discos.length > 0) {
+    tbl(
+      ['Modelo','Tipo','Capacidad','Estado'],
+      S.discos.map(function(dk) { return [dk.modelo||'', dk.tipo||'', dk.capacidad||'', dk.estado||'']; }),
+      { 0:{ cellWidth:80 }, 1:{ cellWidth:28 }, 2:{ cellWidth:25 } }
+    );
+  } else {
+    doc.setFontSize(8); doc.setTextColor(100,100,100);
+    doc.text('Sin datos de almacenamiento.', ML, Y); Y += 8;
+    doc.setTextColor(0,0,0);
+  }
 
   secHeader('Aplicativos de Campaña');
   tbl(
@@ -633,6 +769,11 @@ function generarPDF() {
   }
   checkY(10);
   doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.text('Cumple drivers requeridos: ', ML, Y);
+  doc.setFont('helvetica','normal');
+  doc.text(S.driversCumple || '—', ML+60, Y);
+  Y += 6;
+  doc.setFont('helvetica','bold'); doc.setFontSize(8);
   doc.text('Observaciones: ', ML, Y);
   doc.setFont('helvetica','normal');
   doc.text(S.obsDrivers || 'Sin observaciones', ML+32, Y);
@@ -640,6 +781,15 @@ function generarPDF() {
 
   // 4. PERIFÉRICOS
   secHeader('4. Verificación Física de Periféricos');
+
+  // Limpieza interna
+  checkY(14);
+  tbl(
+    ['Campo','Resultado','Observaciones'],
+    [['Limpieza interna del equipo', S.limpiezaInterna || '—', S.obsLimpieza || 'Sin observaciones']],
+    { 0:{ cellWidth:60, fontStyle:'bold' }, 1:{ cellWidth:40 } }
+  );
+
   tbl(
     ['Periférico','¿Funciona?','Observación'],
     PERIFERICOS.map(function(p) {
@@ -687,39 +837,97 @@ function generarPDF() {
   // 6. FIRMAS
   checkY(90);
   secHeader('6. Información de Entrega y Firmas');
-  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(100,100,100);
-  doc.text('Complete los siguientes datos manualmente y firme físicamente este documento.', ML, Y);
-  Y += 9; doc.setTextColor(0,0,0); doc.setFont('helvetica','normal');
 
   const hw = (W - 6) / 2;
 
-  function bloquePersona(x, titulo, campos) {
-    const altura = 14 + campos.length * 11 + 20;
-    doc.setFillColor(240,240,240);
-    doc.rect(x, Y, hw, altura, 'FD');
-    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(0,0,0);
-    doc.text(titulo, x+3, Y+6);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
-    campos.forEach(function(f, i) {
-      doc.setTextColor(100,100,100);
-      doc.text(f + ':', x+3, Y+15+i*11);
-      doc.setDrawColor(180,180,180);
-      doc.line(x+3, Y+20+i*11, x+hw-3, Y+20+i*11);
+  // Datos de las personas
+  const personas = [
+    {
+      titulo: 'COLABORADOR RECEPTOR',
+      x: ML,
+      campos: [
+        { label: 'Nombre completo', val: S.colNombre },
+        { label: 'Cédula',          val: S.colCedula },
+        { label: 'Cargo',           val: S.colCargo },
+        { label: 'Teléfono',        val: S.colTelefono },
+        { label: 'Campaña / Área',  val: S.colCampana },
+      ]
+    },
+    {
+      titulo: 'TÉCNICO RESPONSABLE',
+      x: ML + hw + 6,
+      campos: [
+        { label: 'Nombre completo', val: S.tecNombre },
+        { label: 'Cargo',           val: S.tecCargo },
+      ]
+    }
+  ];
+
+  // Calcular altura del bloque más alto (colaborador tiene 5 campos)
+  const ROW_H   = 13;   // altura por fila de dato
+  const SIG_H   = 28;   // altura zona firma (firma + fecha + separación)
+  const PAD_TOP = 10;
+  const PAD_BOT = 6;
+  const maxCampos = 5;
+  const alturaBloque = PAD_TOP + maxCampos * ROW_H + SIG_H + PAD_BOT;
+
+  checkY(alturaBloque + 4);
+
+  personas.forEach(function(p) {
+    const bx = p.x;
+    const by = Y;
+
+    // Fondo
+    doc.setFillColor(245, 245, 245);
+    doc.setDrawColor(180, 180, 180);
+    doc.setLineWidth(0.3);
+    doc.rect(bx, by, hw, alturaBloque, 'FD');
+
+    // Título bloque
+    doc.setFillColor(220, 220, 220);
+    doc.rect(bx, by, hw, 8, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(0, 0, 0);
+    doc.text(p.titulo, bx + 4, by + 5.5);
+
+    // Filas de datos
+    let ry = by + PAD_TOP + 2;
+    p.campos.forEach(function(f) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(80, 80, 80);
+      doc.text(f.label + ':', bx + 4, ry);
+
+      if (f.val && f.val.trim() !== '') {
+        // Valor ingresado → mostrar texto
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(0, 0, 0);
+        doc.text(f.val.trim(), bx + 4, ry + 5);
+      } else {
+        // Sin valor → línea para llenado manual
+        doc.setDrawColor(160, 160, 160); doc.setLineWidth(0.3);
+        doc.line(bx + 4, ry + 5.5, bx + hw - 4, ry + 5.5);
+      }
+      ry += ROW_H;
     });
-    const sigY = Y + 14 + campos.length * 11;
-    doc.setTextColor(100,100,100); doc.setFontSize(6.5);
-    doc.text('Firma:', x+3, sigY);
-    doc.setDrawColor(0,0,0);
-    doc.line(x+14, sigY, x+hw-3, sigY);
-    doc.text('Fecha:', x+3, sigY+8);
-    doc.line(x+14, sigY+8, x+hw-3, sigY+8);
-  }
 
-  bloquePersona(ML,      'COLABORADOR RECEPTOR', ['Nombre completo','Cédula','Cargo','Teléfono','Campaña / Área']);
-  bloquePersona(ML+hw+6, 'TÉCNICO RESPONSABLE',  ['Nombre completo','Cargo']);
+    // Zona de firma — siempre al fondo del bloque con separación
+    const sigZoneY = by + alturaBloque - SIG_H - PAD_BOT + 2;
 
-  const alturaMax = 14 + 5*11 + 20;
-  Y += alturaMax + 6;
+    // Separador
+    doc.setDrawColor(180, 180, 180); doc.setLineWidth(0.4);
+    doc.line(bx + 4, sigZoneY, bx + hw - 4, sigZoneY);
+
+    // Firma
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(80, 80, 80);
+    doc.text('Firma:', bx + 4, sigZoneY + 8);
+    doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4);
+    doc.line(bx + 18, sigZoneY + 8, bx + hw - 4, sigZoneY + 8);
+
+    // Fecha
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(80, 80, 80);
+    doc.text('Fecha:', bx + 4, sigZoneY + 18);
+    doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4);
+    doc.line(bx + 18, sigZoneY + 18, bx + hw - 4, sigZoneY + 18);
+  });
+
+  Y += alturaBloque + 8;
 
   // FOOTER
   const total = doc.internal.getNumberOfPages();
