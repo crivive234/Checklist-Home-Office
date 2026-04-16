@@ -3,22 +3,31 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Checklist Alistamiento — OTD Américas</title>
+<title>Checklist — OTD Américas</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', sans-serif; font-size: 14px; background: #f5f5f5; color: #111; }
-
 #wrap { max-width: 900px; margin: 0 auto; padding: 32px 16px 80px; }
 
 header {
-  border-bottom: 3px solid #111; padding-bottom: 14px; margin-bottom: 28px;
+  border-bottom: 3px solid #111; padding-bottom: 14px; margin-bottom: 12px;
   display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
 header h1 { font-size: 20px; font-weight: 800; letter-spacing: .5px; }
 header p  { font-size: 11px; color: #555; margin-top: 2px; }
 .badge { font-size: 10px; font-weight: 700; border: 1.5px solid #111; padding: 3px 10px; letter-spacing: 1px; }
+
+/* ── TIPO CHECKLIST BAR ── */
+#tipo-bar {
+  background: #fff; border: 1.5px solid #111; padding: 14px 20px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+#tipo-bar label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #555; white-space: nowrap; }
+#tipo-checklist { border: 1.5px solid #bbb; padding: 7px 10px; font-size: 13px; font-family: inherit; background: #fff; color: #111; outline: none; flex: 1; min-width: 220px; }
+#tipo-checklist:focus { border-color: #111; }
+#tipo-desc { font-size: 11px; color: #555; font-style: italic; flex-basis: 100%; padding-top: 2px; }
 
 #import-bar {
   background: #fff; border: 1.5px solid #111; padding: 16px 20px; margin-bottom: 12px;
@@ -67,6 +76,16 @@ header p  { font-size: 11px; color: #555; margin-top: 2px; }
 }
 .search-box:focus { border-color: #111; }
 
+/* ── SELECTOR ACTIONS ── */
+.sel-actions { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.sel-actions span { font-size: 11px; color: #555; margin-right: 4px; }
+.sel-actions button {
+  font-size: 11px; font-family: inherit; padding: 3px 10px; border: 1.5px solid #bbb;
+  background: #fff; cursor: pointer; transition: all .15s;
+}
+.sel-actions button:hover { border-color: #111; background: #f5f5f5; }
+.sel-badge { font-size: 10px; font-weight: 700; background: #111; color: #fff; padding: 2px 8px; margin-left: 8px; }
+
 .radios { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .radios button {
   border: 1.5px solid #bbb; background: #fff; font-size: 12px; font-family: inherit;
@@ -74,6 +93,7 @@ header p  { font-size: 11px; color: #555; margin-top: 2px; }
 }
 .radios button:hover { border-color: #111; }
 .radios button.sel { background: #111; color: #fff; border-color: #111; }
+.radios button.sel-na { background: #6b7280; color: #fff; border-color: #6b7280; }
 
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 th { text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #555; border-bottom: 1.5px solid #111; padding: 6px 8px; }
@@ -85,6 +105,12 @@ td input[type=text], td select {
 }
 td input:focus, td select:focus { border-color: #111; }
 
+/* ── CHECKBOX ── */
+td input[type=checkbox] {
+  width: 16px; height: 16px; cursor: pointer; accent-color: #111;
+}
+th.col-chk, td.col-chk { width: 32px; text-align: center; padding: 6px 4px; }
+
 #ping-display {
   display: inline-block; padding: 8px 14px; border: 1.5px solid #ddd;
   background: #fafafa; font-size: 13px; margin-top: 6px;
@@ -95,6 +121,21 @@ td input:focus, td select:focus { border-color: #111; }
 hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
 .note { font-size: 11px; color: #777; margin-bottom: 8px; }
 .lbl-sub { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: #555; display: block; margin-bottom: 8px; }
+
+/* ── FIRMA CANVAS ── */
+.firma-wrap { margin-top: 16px; }
+.firma-wrap .lbl-sub { margin-bottom: 6px; }
+.canvas-firma {
+  display: block; cursor: crosshair; border: 1.5px solid #bbb; background: #fff;
+  touch-action: none; width: 100%; height: 130px;
+}
+.canvas-firma:focus { outline: none; border-color: #111; }
+.firma-note { font-size: 10px; color: #888; margin-top: 4px; margin-bottom: 6px; }
+.btn-clear-firma {
+  font-size: 11px; font-family: inherit; padding: 4px 12px; border: 1.5px solid #bbb;
+  background: #fff; cursor: pointer; margin-top: 4px;
+}
+.btn-clear-firma:hover { border-color: #111; }
 
 #btn-pdf {
   display: block; width: 100%; background: #111; color: #fff; font-size: 14px;
@@ -115,11 +156,21 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
 
   <header>
     <div>
-      <h1>CHECKLIST — ALISTAMIENTO HOME OFFICE</h1>
-      <p>OTD Américas · Validación técnica de equipos para trabajo remoto</p>
+      <h1 id="header-title">CHECKLIST — ALISTAMIENTO HOME OFFICE</h1>
+      <p id="header-desc">OTD Américas · Validación técnica de equipos para trabajo remoto</p>
     </div>
     <div class="badge">OTD AMÉRICAS</div>
   </header>
+
+  <!-- TIPO DE CHECKLIST -->
+  <div id="tipo-bar">
+    <label for="tipo-checklist">Tipo de Checklist</label>
+    <select id="tipo-checklist" onchange="actualizarTipoChecklist(this.value)">
+      <option value="alistamiento">Alistamiento Entrega de equipo Home Office</option>
+      <option value="pazsalvo">Paz y Salvo (Entrega de equipo)</option>
+    </select>
+    <span id="tipo-desc">Validación técnica de equipos para trabajo remoto · Laptops y equipos de escritorio</span>
+  </div>
 
   <!-- EJECUTAR SCRIPT -->
   <div id="run-bar">
@@ -197,12 +248,18 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
       <hr/>
 
       <span class="lbl-sub">Programas Instalados</span>
-      <p class="note">Lista obtenida automáticamente del equipo.</p>
+      <p class="note">Marca los programas que deseas incluir en el reporte exportado. Si no seleccionas ninguno, no se exportará ninguno.</p>
       <input type="text" class="search-box" id="search-programas" placeholder="🔍 Buscar por programa o editor..." oninput="filtrarProgramas(this.value)"/>
+      <div class="sel-actions">
+        <span>Seleccionar:</span>
+        <button onclick="seleccionarTodosProgramas(true)">Todos</button>
+        <button onclick="seleccionarTodosProgramas(false)">Ninguno</button>
+        <span class="sel-badge" id="badge-programas">0 sel.</span>
+      </div>
       <div style="max-height:220px; overflow-y:auto; border:1px solid #e0e0e0;">
         <table>
-          <thead><tr><th>Programa</th><th>Editor</th><th>Versión</th></tr></thead>
-          <tbody id="tbody-programas"><tr><td colspan="3" style="color:#aaa;">Sin datos cargados</td></tr></tbody>
+          <thead><tr><th class="col-chk">✓</th><th>Programa</th><th>Editor</th><th>Versión</th></tr></thead>
+          <tbody id="tbody-programas"><tr><td colspan="4" style="color:#aaa;">Sin datos cargados</td></tr></tbody>
         </table>
       </div>
 
@@ -230,12 +287,18 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
   <div class="section">
     <div class="section-title">2. Drivers Instalados</div>
     <div class="section-body">
-      <p class="note">Lista obtenida automáticamente del equipo.</p>
+      <p class="note">Marca los drivers que deseas incluir en el reporte exportado. Si no seleccionas ninguno, no se exportará ninguno.</p>
       <input type="text" class="search-box" id="search-drivers" placeholder="🔍 Buscar por dispositivo o clase..." oninput="filtrarDrivers(this.value)"/>
+      <div class="sel-actions">
+        <span>Seleccionar:</span>
+        <button onclick="seleccionarTodosDrivers(true)">Todos</button>
+        <button onclick="seleccionarTodosDrivers(false)">Ninguno</button>
+        <span class="sel-badge" id="badge-drivers">0 sel.</span>
+      </div>
       <div style="max-height:240px; overflow-y:auto; border:1px solid #e0e0e0; margin-bottom:14px;">
         <table>
-          <thead><tr><th>Dispositivo</th><th>Clase</th><th>Versión</th></tr></thead>
-          <tbody id="tbody-drivers"><tr><td colspan="3" style="color:#aaa;">Sin datos cargados</td></tr></tbody>
+          <thead><tr><th class="col-chk">✓</th><th>Dispositivo</th><th>Clase</th><th>Versión</th></tr></thead>
+          <tbody id="tbody-drivers"><tr><td colspan="4" style="color:#aaa;">Sin datos cargados</td></tr></tbody>
         </table>
       </div>
       <div style="margin-bottom:14px;">
@@ -276,6 +339,9 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
         </div>
       </div>
 
+      <p class="note" style="margin-bottom:8px;">
+        Usa <strong>N/A</strong> (No Aplica) para periféricos que no correspondan al tipo de equipo (ej: monitor, teclado o mouse externo en laptops).
+      </p>
       <hr/>
       <span class="lbl-sub">Periféricos</span>
       <table id="tbl-perifericos" style="margin-bottom:16px;">
@@ -313,8 +379,9 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
   <div class="section">
     <div class="section-title">5. Información de Entrega y Firmas</div>
     <div class="section-body">
-      <p class="note" style="margin-bottom:16px;">Complete los datos antes de generar el PDF. Los campos con información aparecerán impresos; los vacíos quedarán como líneas para firma manual.</p>
+      <p class="note" style="margin-bottom:16px;">Complete los datos antes de generar el PDF. Los campos con información aparecerán impresos; los vacíos quedarán como líneas para firma manual. Puede firmar digitalmente en el área de firma o dejarla en blanco para firmar el documento impreso.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;">
+        <!-- COLABORADOR -->
         <div>
           <span class="lbl-sub">Colaborador Receptor</span>
           <div class="field" style="margin-bottom:10px;"><label>Nombre completo</label><input type="text" id="colNombre" placeholder="Nombre del colaborador"/></div>
@@ -322,11 +389,24 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
           <div class="field" style="margin-bottom:10px;"><label>Cargo</label><input type="text" id="colCargo" placeholder="Cargo o posición"/></div>
           <div class="field" style="margin-bottom:10px;"><label>Teléfono</label><input type="text" id="colTelefono" placeholder="Teléfono de contacto"/></div>
           <div class="field"><label>Campaña / Área</label><input type="text" id="colCampana" placeholder="Campaña o área asignada"/></div>
+          <div class="firma-wrap">
+            <span class="lbl-sub">Firma Digital — Colaborador</span>
+            <canvas id="canvas-firma-col" class="canvas-firma"></canvas>
+            <p class="firma-note">Dibuja tu firma con el ratón o el dedo. Si prefieres firmar en papel, deja este campo en blanco.</p>
+            <button type="button" class="btn-clear-firma" onclick="limpiarCanvas('canvas-firma-col','firmaColaborador')">✕ Limpiar firma</button>
+          </div>
         </div>
+        <!-- TÉCNICO -->
         <div>
           <span class="lbl-sub">Técnico Responsable</span>
           <div class="field" style="margin-bottom:10px;"><label>Nombre completo</label><input type="text" id="tecNombre" placeholder="Nombre del técnico"/></div>
           <div class="field"><label>Cargo</label><input type="text" id="tecCargo" placeholder="Cargo o posición"/></div>
+          <div class="firma-wrap">
+            <span class="lbl-sub">Firma Digital — Técnico</span>
+            <canvas id="canvas-firma-tec" class="canvas-firma"></canvas>
+            <p class="firma-note">Dibuja tu firma con el ratón o el dedo. Si prefieres firmar en papel, deja este campo en blanco.</p>
+            <button type="button" class="btn-clear-firma" onclick="limpiarCanvas('canvas-firma-tec','firmaTecnico')">✕ Limpiar firma</button>
+          </div>
         </div>
       </div>
     </div>
@@ -338,20 +418,46 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
 <div id="toast"></div>
 
 <script>
+// ── CONFIGURACIÓN TIPOS DE CHECKLIST ──
+const TIPOS_CHECKLIST = {
+  alistamiento: {
+    titulo:    'CHECKLIST — ALISTAMIENTO ENTREGA DE EQUIPO HOME OFFICE',
+    subtitulo: 'OTD Américas · Validación técnica de equipos para trabajo remoto',
+    desc:      'Validación técnica de equipos para trabajo remoto · Laptops y equipos de escritorio'
+  },
+  pazsalvo: {
+    titulo:    'CHECKLIST — PAZ Y SALVO (ENTREGA DE EQUIPO)',
+    subtitulo: 'OTD Américas · Certificación de entrega y devolución de equipo de cómputo',
+    desc:      'Certificación de entrega y devolución de equipo de cómputo · Laptops y equipos de escritorio'
+  }
+};
+
+function actualizarTipoChecklist(val) {
+  S.tipoChecklist = val;
+  const t = TIPOS_CHECKLIST[val] || TIPOS_CHECKLIST.alistamiento;
+  document.getElementById('header-title').textContent = t.titulo;
+  document.getElementById('header-desc').textContent  = t.subtitulo;
+  document.getElementById('tipo-desc').textContent    = t.desc;
+}
+
 // ── ESTADO ──
 const S = {
+  tipoChecklist: 'alistamiento',
   hostname:'', fecha: new Date().toISOString().slice(0,10),
   marca:'', modelo:'', serialNumber:'', osVersion:'', winRelease:'',
   procesador:'', nucleos:'', ram:'', ramTipo:'', ramFrecuencia:'', bios:'',
   winUpdate:'', appsCumple:'', driversCumple:'', winLicencia:'', winLicenciaTipo:'', winLicenciaCanal:'',
   discos:[],
   programas:[], drivers:[], tarjetasRed:[],
+  programasSeleccionados: new Set(),
+  driversSeleccionados:   new Set(),
   pingResultado:'', pingMs:0, pingPerdida:0,
   perifericos:{}, cables:{},
   limpiezaInterna:'', obsLimpieza:'',
   obsApps:'', obsDrivers:'',
   colNombre:'', colCedula:'', colCargo:'', colTelefono:'', colCampana:'',
-  tecNombre:'', tecCargo:''
+  tecNombre:'', tecCargo:'',
+  firmaColaborador:'', firmaTecnico:''
 };
 
 const PERIFERICOS = [
@@ -367,43 +473,228 @@ const TIPOS_VIDEO = ['DisplayPort a VGA','HDMI a VGA','VGA','HDMI','DisplayPort'
 const TIPOS_UTP   = ['Cat 5','Cat 5e','Cat 6','Cat 6e'];
 
 const CABLES = [
-  { key:'video',    label:'Cable de Video',     tipoSelect:'video', funciona:true },
-  { key:'red',      label:'Cable de Red (UTP)', tipoSelect:'utp',   funciona:true },
-  { key:'powerpc',  label:'Cable Poder Equipo', tipoSelect:false,   funciona:true },
-  { key:'powermon', label:'Cable Poder Monitor',tipoSelect:false,   funciona:true },
+  { key:'video',    label:'Cable de Video',      tipoSelect:'video', funciona:true },
+  { key:'red',      label:'Cable de Red (UTP)',  tipoSelect:'utp',   funciona:true },
+  { key:'powerpc',  label:'Cable Poder Equipo',  tipoSelect:false,   funciona:true },
+  { key:'powermon', label:'Cable Poder Monitor', tipoSelect:false,   funciona:true },
 ];
 
+// ── HELPERS RADIOS CON N/A ──
+function makeRadios(key, obj, field, values) {
+  return '<div class="radios">' +
+    values.map(function(v) {
+      const isNA = v === 'N/A';
+      return '<button onclick="' +
+        'S.' + obj + '[\'' + key + '\'].' + field + '=\'' + v + '\';' +
+        'this.closest(\'.radios\').querySelectorAll(\'button\').forEach(function(b){b.className=\'\'});' +
+        'this.className=\'' + (isNA ? 'sel-na' : 'sel') + '\'">' + v + '</button>';
+    }).join('') +
+  '</div>';
+}
+
+// ── RENDER PERIFÉRICOS ──
+function renderPerifericos() {
+  document.querySelector('#tbl-perifericos tbody').innerHTML = PERIFERICOS.map(function(p) {
+    return '<tr>' +
+      '<td style="font-weight:600;white-space:nowrap;">' + p.label + '</td>' +
+      '<td>' + makeRadios(p.key, 'perifericos', 'funciona', ['Sí','No','N/A']) + '</td>' +
+      '<td><input type="text" class="perf-obs" placeholder="Sin observaciones" oninput="S.perifericos[\'' + p.key + '\'].obs=this.value"/></td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ── RENDER CABLES ──
+function renderCables() {
+  document.querySelector('#tbl-cables tbody').innerHTML = CABLES.map(function(c) {
+    let tipoCell = '';
+    if (c.tipoSelect === 'video') {
+      tipoCell = '<select onchange="S.cables[\'' + c.key + '\'].tipo=this.value"><option value="">— Seleccionar —</option>' +
+        TIPOS_VIDEO.map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join('') + '</select>';
+    } else if (c.tipoSelect === 'utp') {
+      tipoCell = '<select onchange="S.cables[\'' + c.key + '\'].tipo=this.value"><option value="">— Seleccionar —</option>' +
+        TIPOS_UTP.map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join('') + '</select>';
+    } else {
+      tipoCell = '<span style="color:#aaa;font-size:11px;">N/A</span>';
+    }
+    return '<tr>' +
+      '<td style="font-weight:600;white-space:nowrap;">' + c.label + '</td>' +
+      '<td>' + tipoCell + '</td>' +
+      '<td>' + makeRadios(c.key, 'cables', 'tiene',    ['Sí','No','N/A']) + '</td>' +
+      '<td>' + makeRadios(c.key, 'cables', 'funciona', ['Sí','No','N/A']) + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// ── RENDER PROGRAMAS (con checkbox) ──
+function renderProgramasTable(lista) {
+  const tbody = document.getElementById('tbody-programas');
+  if (!lista || lista.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;">Sin datos cargados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map(function(p) {
+    const idx = S.programas.indexOf(p);
+    const checked = S.programasSeleccionados.has(idx) ? 'checked' : '';
+    return '<tr>' +
+      '<td class="col-chk"><input type="checkbox" ' + checked + ' onchange="togglePrograma(' + idx + ',this.checked)"/></td>' +
+      '<td>' + esc(p.nombre||'') + '</td>' +
+      '<td>' + esc(p.editor||'') + '</td>' +
+      '<td>' + esc(p.version||'') + '</td>' +
+    '</tr>';
+  }).join('');
+  actualizarBadgeProgramas();
+}
+
+function togglePrograma(idx, checked) {
+  if (checked) S.programasSeleccionados.add(idx);
+  else         S.programasSeleccionados.delete(idx);
+  actualizarBadgeProgramas();
+}
+
+function actualizarBadgeProgramas() {
+  document.getElementById('badge-programas').textContent = S.programasSeleccionados.size + ' sel.';
+}
+
+function seleccionarTodosProgramas(todos) {
+  S.programasSeleccionados.clear();
+  if (todos) S.programas.forEach(function(_,i){ S.programasSeleccionados.add(i); });
+  renderProgramasTable(S.programas);
+}
+
+// ── RENDER DRIVERS (con checkbox) ──
+function renderDriversTable(lista) {
+  const tbody = document.getElementById('tbody-drivers');
+  if (!lista || lista.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;">Sin datos cargados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = lista.map(function(dr) {
+    const idx = S.drivers.indexOf(dr);
+    const checked = S.driversSeleccionados.has(idx) ? 'checked' : '';
+    return '<tr>' +
+      '<td class="col-chk"><input type="checkbox" ' + checked + ' onchange="toggleDriver(' + idx + ',this.checked)"/></td>' +
+      '<td>' + esc(dr.nombre||'') + '</td>' +
+      '<td>' + esc(dr.clase||'') + '</td>' +
+      '<td>' + esc(dr.version||'') + '</td>' +
+    '</tr>';
+  }).join('');
+  actualizarBadgeDrivers();
+}
+
+function toggleDriver(idx, checked) {
+  if (checked) S.driversSeleccionados.add(idx);
+  else         S.driversSeleccionados.delete(idx);
+  actualizarBadgeDrivers();
+}
+
+function actualizarBadgeDrivers() {
+  document.getElementById('badge-drivers').textContent = S.driversSeleccionados.size + ' sel.';
+}
+
+function seleccionarTodosDrivers(todos) {
+  S.driversSeleccionados.clear();
+  if (todos) S.drivers.forEach(function(_,i){ S.driversSeleccionados.add(i); });
+  renderDriversTable(S.drivers);
+}
+
+// ── CANVAS FIRMA ──
+function initCanvas(canvasId, stateKey) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Ajustar resolución al tamaño real del canvas en pantalla
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr  = window.devicePixelRatio || 1;
+    if (canvas.width !== rect.width * dpr) {
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      canvas.width  = rect.width  * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.putImageData(imgData, 0, 0);
+    }
+  }
+
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth   = 1.8;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  let drawing = false;
+
+  function getPos(e) {
+    const rect    = canvas.getBoundingClientRect();
+    const dpr     = window.devicePixelRatio || 1;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (clientX - rect.left), y: (clientY - rect.top) };
+  }
+
+  function startDraw(e) {
+    resize();
+    drawing = true;
+    const p = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+  }
+  function draw(e) {
+    if (!drawing) return;
+    const p = getPos(e);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    S[stateKey] = canvas.toDataURL('image/png');
+  }
+  function endDraw() { drawing = false; }
+
+  canvas.addEventListener('mousedown',  startDraw);
+  canvas.addEventListener('mousemove',  draw);
+  canvas.addEventListener('mouseup',    endDraw);
+  canvas.addEventListener('mouseleave', endDraw);
+  canvas.addEventListener('touchstart', function(e){ e.preventDefault(); startDraw(e); }, { passive:false });
+  canvas.addEventListener('touchmove',  function(e){ e.preventDefault(); draw(e);      }, { passive:false });
+  canvas.addEventListener('touchend',   endDraw);
+}
+
+function limpiarCanvas(canvasId, stateKey) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  S[stateKey] = '';
+}
+
 // ── INIT ──
-window.onload = () => {
+window.onload = function() {
   document.getElementById('fecha').value = S.fecha;
-  document.getElementById('fecha').addEventListener('change', e => S.fecha = e.target.value);
-  document.getElementById('obs-apps').addEventListener('input',    e => S.obsApps    = e.target.value);
-  document.getElementById('obs-drivers').addEventListener('input', e => S.obsDrivers = e.target.value);
-  document.getElementById('obs-limpieza').addEventListener('input', e => S.obsLimpieza = e.target.value);
+  document.getElementById('fecha').addEventListener('change', function(e){ S.fecha = e.target.value; });
+  document.getElementById('obs-apps').addEventListener('input',    function(e){ S.obsApps    = e.target.value; });
+  document.getElementById('obs-drivers').addEventListener('input', function(e){ S.obsDrivers = e.target.value; });
+  document.getElementById('obs-limpieza').addEventListener('input', function(e){ S.obsLimpieza = e.target.value; });
 
   ['colNombre','colCedula','colCargo','colTelefono','colCampana','tecNombre','tecCargo'].forEach(function(id) {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('input', function(e) { S[id] = e.target.value; });
+    if (el) el.addEventListener('input', function(e){ S[id] = e.target.value; });
   });
 
-  PERIFERICOS.forEach(p => { S.perifericos[p.key] = { funciona:'', obs:'' }; });
-  CABLES.forEach(c => { S.cables[c.key] = { tipo:'', tiene:'', funciona:'' }; });
+  PERIFERICOS.forEach(function(p){ S.perifericos[p.key] = { funciona:'', obs:'' }; });
+  CABLES.forEach(function(c){ S.cables[c.key] = { tipo:'', tiene:'', funciona:'' }; });
 
   renderPerifericos();
   renderCables();
 
-  document.getElementById('json-file').addEventListener('change', e => {
+  initCanvas('canvas-firma-col', 'firmaColaborador');
+  initCanvas('canvas-firma-tec', 'firmaTecnico');
+
+  document.getElementById('json-file').addEventListener('change', function(e){
     const f = e.target.files[0];
     if (!f) return;
     const r = new FileReader();
-    r.onload = ev => importJSON(ev.target.result, f.name);
+    r.onload = function(ev){ importJSON(ev.target.result, f.name); };
     r.readAsText(f);
   });
 };
 
 // ── DESCARGAR LANZADOR BAT ──
-// El .bat es reconocido por Windows como archivo seguro de sistema
-// y no genera el bloqueo de "seguridad de Internet" que producen los .vbs
 function descargarLanzador() {
   const bat = [
     '@echo off',
@@ -415,17 +706,12 @@ function descargarLanzador() {
     'echo Listo. Puedes cerrar esta ventana y cargar el JSON en la pagina.',
     'pause'
   ].join('\r\n');
-
   const blob = new Blob([bat], { type: 'text/plain' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url;
-  a.download = 'lanzar-script.bat';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
+  a.href = url; a.download = 'lanzar-script.bat';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
   toast('lanzar-script.bat descargado — colócalo en la misma carpeta y ejecútalo');
 }
 
@@ -433,7 +719,6 @@ function descargarLanzador() {
 function importJSON(text, fname) {
   try {
     const d = JSON.parse(text);
-
     setF('hostname',     d.hostname     || '');
     setF('marca',        d.marca        || '');
     setF('modelo',       d.modelo       || '');
@@ -451,7 +736,7 @@ function importJSON(text, fname) {
       const tbody = document.getElementById('tbody-discos');
       if (d.discos.length > 0) {
         tbody.innerHTML = d.discos.map(function(dk) {
-          const tipo = dk.tipo || '';
+          const tipo  = dk.tipo || '';
           const badge = tipo.includes('NVMe') ? 'background:#e8f0fe;color:#1a56db;' :
                         tipo.includes('SSD')  ? 'background:#e6f9ed;color:#0a6b2e;' :
                         tipo.includes('HDD')  ? 'background:#fff3e0;color:#b45309;' : '';
@@ -460,7 +745,7 @@ function importJSON(text, fname) {
             '<td><span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;' + badge + '">' + esc(tipo) + '</span></td>' +
             '<td>' + esc(dk.capacidad||'') + '</td>' +
             '<td>' + esc(dk.estado||'') + '</td>' +
-            '</tr>';
+          '</tr>';
         }).join('');
       } else {
         tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;">Sin discos detectados</td></tr>';
@@ -473,11 +758,13 @@ function importJSON(text, fname) {
 
     if (Array.isArray(d.drivers)) {
       S.drivers = d.drivers;
+      S.driversSeleccionados.clear();
       renderDriversTable(S.drivers);
     }
 
     if (Array.isArray(d.programas)) {
       S.programas = d.programas;
+      S.programasSeleccionados.clear();
       renderProgramasTable(S.programas);
     }
 
@@ -491,7 +778,7 @@ function importJSON(text, fname) {
           '<td style="font-family:monospace;font-size:11px;">' + esc(t.ip||'—') + '</td>' +
           '<td>' + esc(t.estado||'') + '</td>' +
           '<td>' + esc(t.velocidad||'') + '</td>' +
-          '</tr>';
+        '</tr>';
       }).join('');
     }
 
@@ -515,7 +802,6 @@ function importJSON(text, fname) {
       autoMark('radios-winUpdate', val);
     }
 
-    // Licencia de Windows
     if (d.winLicencia) {
       S.winLicencia      = d.winLicencia;
       S.winLicenciaTipo  = d.winLicenciaTipo  || '';
@@ -529,47 +815,56 @@ function importJSON(text, fname) {
     }
 
     document.getElementById('import-status').textContent = '✓ ' + fname;
-    document.getElementById('import-status').className = 'ok';
+    document.getElementById('import-status').className   = 'ok';
     toast('Datos cargados correctamente');
   } catch(e) {
     alert('Error al leer el JSON: ' + e.message);
   }
 }
 
-function renderProgramasTable(lista) {
-  const tbody = document.getElementById('tbody-programas');
-  if (!lista || lista.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" style="color:#aaa;">Sin datos cargados</td></tr>';
-    return;
-  }
-  tbody.innerHTML = lista.map(function(p) {
-    return '<tr><td>' + esc(p.nombre||'') + '</td><td>' + esc(p.editor||'') + '</td><td>' + esc(p.version||'') + '</td></tr>';
-  }).join('');
-}
-
-function renderDriversTable(lista) {
-  const tbody = document.getElementById('tbody-drivers');
-  if (!lista || lista.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" style="color:#aaa;">Sin datos cargados</td></tr>';
-    return;
-  }
-  tbody.innerHTML = lista.map(function(dr) {
-    return '<tr><td>' + esc(dr.nombre||'') + '</td><td>' + esc(dr.clase||'') + '</td><td>' + esc(dr.version||'') + '</td></tr>';
-  }).join('');
-}
-
 function filtrarProgramas(q) {
   const lower = q.toLowerCase();
-  renderProgramasTable(S.programas.filter(function(p) {
+  const filtered = S.programas.filter(function(p){
     return (p.nombre||'').toLowerCase().includes(lower) || (p.editor||'').toLowerCase().includes(lower);
-  }));
+  });
+  // Render filtered but preserve checkbox state using original indices
+  const tbody = document.getElementById('tbody-programas');
+  if (!filtered || filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;">Sin resultados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(function(p) {
+    const idx     = S.programas.indexOf(p);
+    const checked = S.programasSeleccionados.has(idx) ? 'checked' : '';
+    return '<tr>' +
+      '<td class="col-chk"><input type="checkbox" ' + checked + ' onchange="togglePrograma(' + idx + ',this.checked)"/></td>' +
+      '<td>' + esc(p.nombre||'') + '</td>' +
+      '<td>' + esc(p.editor||'') + '</td>' +
+      '<td>' + esc(p.version||'') + '</td>' +
+    '</tr>';
+  }).join('');
 }
 
 function filtrarDrivers(q) {
   const lower = q.toLowerCase();
-  renderDriversTable(S.drivers.filter(function(d) {
-    return (d.nombre||'').toLowerCase().includes(lower) || (d.clase||'').toLowerCase().includes(lower);
-  }));
+  const filtered = S.drivers.filter(function(dr){
+    return (dr.nombre||'').toLowerCase().includes(lower) || (dr.clase||'').toLowerCase().includes(lower);
+  });
+  const tbody = document.getElementById('tbody-drivers');
+  if (!filtered || filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;">Sin resultados</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(function(dr) {
+    const idx     = S.drivers.indexOf(dr);
+    const checked = S.driversSeleccionados.has(idx) ? 'checked' : '';
+    return '<tr>' +
+      '<td class="col-chk"><input type="checkbox" ' + checked + ' onchange="toggleDriver(' + idx + ',this.checked)"/></td>' +
+      '<td>' + esc(dr.nombre||'') + '</td>' +
+      '<td>' + esc(dr.clase||'') + '</td>' +
+      '<td>' + esc(dr.version||'') + '</td>' +
+    '</tr>';
+  }).join('');
 }
 
 function setF(id, val) {
@@ -577,73 +872,23 @@ function setF(id, val) {
   if (el) el.value = val;
   S[id] = val;
 }
-
 function autoMark(groupId, val) {
   const g = document.getElementById(groupId);
   if (!g) return;
-  g.querySelectorAll('button').forEach(function(b) {
-    b.className = b.textContent.trim() === val ? 'sel' : '';
-  });
+  g.querySelectorAll('button').forEach(function(b){ b.className = b.textContent.trim() === val ? 'sel' : ''; });
 }
-
 function pick(key, btn, val) {
   S[key] = val;
-  btn.closest('.radios').querySelectorAll('button').forEach(function(b) { b.className = ''; });
+  btn.closest('.radios').querySelectorAll('button').forEach(function(b){ b.className = ''; });
   btn.classList.add('sel');
 }
-
-// ── RENDER PERIFÉRICOS ──
-function renderPerifericos() {
-  document.querySelector('#tbl-perifericos tbody').innerHTML = PERIFERICOS.map(function(p) {
-    return '<tr>' +
-      '<td style="font-weight:600;white-space:nowrap;">' + p.label + '</td>' +
-      '<td>' +
-        '<div class="radios">' +
-          '<button onclick="S.perifericos[\'' + p.key + '\'].funciona=\'S\u00ed\';this.closest(\'.radios\').querySelectorAll(\'button\').forEach(function(b){b.className=\'\'});this.className=\'sel\'">Sí</button>' +
-          '<button onclick="S.perifericos[\'' + p.key + '\'].funciona=\'No\';this.closest(\'.radios\').querySelectorAll(\'button\').forEach(function(b){b.className=\'\'});this.className=\'sel\'">No</button>' +
-        '</div>' +
-      '</td>' +
-      '<td><input type="text" class="perf-obs" placeholder="Sin observaciones" oninput="S.perifericos[\'' + p.key + '\'].obs=this.value"/></td>' +
-    '</tr>';
-  }).join('');
-}
-
-// ── RENDER CABLES ──
-function renderCables() {
-  document.querySelector('#tbl-cables tbody').innerHTML = CABLES.map(function(c) {
-    let tipoCell = '';
-    if (c.tipoSelect === 'video') {
-      tipoCell = '<select onchange="S.cables[\'' + c.key + '\'].tipo=this.value"><option value="">— Seleccionar —</option>' +
-        TIPOS_VIDEO.map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join('') + '</select>';
-    } else if (c.tipoSelect === 'utp') {
-      tipoCell = '<select onchange="S.cables[\'' + c.key + '\'].tipo=this.value"><option value="">— Seleccionar —</option>' +
-        TIPOS_UTP.map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join('') + '</select>';
-    } else {
-      tipoCell = '<span style="color:#aaa;font-size:11px;">N/A</span>';
-    }
-    return '<tr>' +
-      '<td style="font-weight:600;white-space:nowrap;">' + c.label + '</td>' +
-      '<td>' + tipoCell + '</td>' +
-      '<td><div class="radios">' +
-        '<button onclick="S.cables[\'' + c.key + '\'].tiene=\'S\u00ed\';this.closest(\'.radios\').querySelectorAll(\'button\').forEach(function(b){b.className=\'\'});this.className=\'sel\'">Sí</button>' +
-        '<button onclick="S.cables[\'' + c.key + '\'].tiene=\'No\';this.closest(\'.radios\').querySelectorAll(\'button\').forEach(function(b){b.className=\'\'});this.className=\'sel\'">No</button>' +
-      '</div></td>' +
-      '<td><div class="radios">' +
-        '<button onclick="S.cables[\'' + c.key + '\'].funciona=\'S\u00ed\';this.closest(\'.radios\').querySelectorAll(\'button\').forEach(function(b){b.className=\'\'});this.className=\'sel\'">Sí</button>' +
-        '<button onclick="S.cables[\'' + c.key + '\'].funciona=\'No\';this.closest(\'.radios\').querySelectorAll(\'button\').forEach(function(b){b.className=\'\'});this.className=\'sel\'">No</button>' +
-      '</div></td>' +
-    '</tr>';
-  }).join('');
-}
-
-// ── UTILS ──
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 3500);
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
 }
 function gv(id) {
   const el = document.getElementById(id);
@@ -654,6 +899,8 @@ function gv(id) {
 function generarPDF() {
   const { jsPDF } = window.jspdf;
   if (!jsPDF) { alert('Error: librería jsPDF no disponible.'); return; }
+
+  const tipo = TIPOS_CHECKLIST[S.tipoChecklist] || TIPOS_CHECKLIST.alistamiento;
 
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
   const PW = 210, ML = 14, MR = 14, W = PW - ML - MR;
@@ -688,17 +935,17 @@ function generarPDF() {
   const hostname = gv('hostname') || 'EQUIPO';
   const fecha    = gv('fecha')    || S.fecha;
 
-  // CABECERA
+  // ── CABECERA PDF ──
   doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(0,0,0);
-  doc.text('CHECKLIST — ALISTAMIENTO HOME OFFICE', ML, Y); Y += 6;
+  doc.text(tipo.titulo, ML, Y); Y += 6;
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(100,100,100);
-  doc.text('OTD Américas  ·  Validación técnica de equipo para trabajo remoto', ML, Y); Y += 5;
+  doc.text(tipo.subtitulo, ML, Y); Y += 5;
   doc.text('Hostname: ' + hostname + '   |   Fecha: ' + fecha, ML, Y); Y += 7;
   doc.setDrawColor(0,0,0); doc.setLineWidth(0.5);
   doc.line(ML, Y, ML+W, Y); Y += 7;
   doc.setLineWidth(0.2); doc.setTextColor(0,0,0);
 
-  // 1. EQUIPO
+  // ── 1. EQUIPO ──
   secHeader('1. Información del Equipo');
   tbl(
     ['Campo','Valor'],
@@ -715,7 +962,7 @@ function generarPDF() {
       ['Frecuencia de RAM',      gv('ramFrecuencia')],
       ['BIOS (Versión / Fecha)', gv('bios')],
       ['Windows Update',         S.winUpdate || '—'],
-      ['Licencia Windows',        S.winLicencia ? (S.winLicencia + (S.winLicenciaCanal ? ' — ' + S.winLicenciaCanal : '') + (S.winLicenciaTipo ? ' (' + S.winLicenciaTipo + ')' : '')) : '—'],
+      ['Licencia Windows',       S.winLicencia ? (S.winLicencia + (S.winLicenciaCanal ? ' — ' + S.winLicenciaCanal : '') + (S.winLicenciaTipo ? ' (' + S.winLicenciaTipo + ')' : '')) : '—'],
     ],
     { 0:{ cellWidth:60, fontStyle:'bold' } }
   );
@@ -725,7 +972,7 @@ function generarPDF() {
   if (S.discos && S.discos.length > 0) {
     tbl(
       ['Modelo','Tipo','Capacidad','Estado'],
-      S.discos.map(function(dk) { return [dk.modelo||'', dk.tipo||'', dk.capacidad||'', dk.estado||'']; }),
+      S.discos.map(function(dk){ return [dk.modelo||'', dk.tipo||'', dk.capacidad||'', dk.estado||'']; }),
       { 0:{ cellWidth:80 }, 1:{ cellWidth:28 }, 2:{ cellWidth:25 } }
     );
   } else {
@@ -744,45 +991,47 @@ function generarPDF() {
     { 0:{ cellWidth:60, fontStyle:'bold' } }
   );
 
-  // 2. PROGRAMAS
-  secHeader('2. Programas Instalados');
-  if (S.programas.length > 0) {
-    tbl(['Programa','Editor','Versión'], S.programas.map(function(p) { return [p.nombre||'', p.editor||'', p.version||'']; }), { 0:{ cellWidth:85 }, 1:{ cellWidth:45 } });
+  // ── 2. PROGRAMAS SELECCIONADOS ──
+  secHeader('2. Programas Instalados (Seleccionados)');
+  const programasExport = S.programas.filter(function(_,i){ return S.programasSeleccionados.has(i); });
+  if (programasExport.length > 0) {
+    tbl(
+      ['Programa','Editor','Versión'],
+      programasExport.map(function(p){ return [p.nombre||'', p.editor||'', p.version||'']; }),
+      { 0:{ cellWidth:85 }, 1:{ cellWidth:45 } }
+    );
   } else {
     doc.setFontSize(8); doc.setTextColor(100,100,100);
-    doc.text('Sin datos de programas.', ML, Y); Y += 8;
+    doc.text('No se seleccionaron programas para exportar.', ML, Y); Y += 8;
     doc.setTextColor(0,0,0);
   }
 
-  // 3. DRIVERS
-  secHeader('3. Drivers Instalados');
-  if (S.drivers.length > 0) {
+  // ── 3. DRIVERS SELECCIONADOS ──
+  secHeader('3. Drivers Instalados (Seleccionados)');
+  const driversExport = S.drivers.filter(function(_,i){ return S.driversSeleccionados.has(i); });
+  if (driversExport.length > 0) {
     tbl(
       ['Dispositivo','Clase','Versión'],
-      S.drivers.map(function(d) { return [d.nombre||'', d.clase||'', d.version||'']; }),
+      driversExport.map(function(d){ return [d.nombre||'', d.clase||'', d.version||'']; }),
       { 0:{ cellWidth:80 }, 1:{ cellWidth:35 } }
     );
   } else {
     doc.setFontSize(8); doc.setTextColor(100,100,100);
-    doc.text('Sin datos de drivers.', ML, Y); Y += 8;
+    doc.text('No se seleccionaron drivers para exportar.', ML, Y); Y += 8;
     doc.setTextColor(0,0,0);
   }
   checkY(10);
   doc.setFont('helvetica','bold'); doc.setFontSize(8);
   doc.text('Cumple drivers requeridos: ', ML, Y);
   doc.setFont('helvetica','normal');
-  doc.text(S.driversCumple || '—', ML+60, Y);
-  Y += 6;
+  doc.text(S.driversCumple || '—', ML+60, Y); Y += 6;
   doc.setFont('helvetica','bold'); doc.setFontSize(8);
   doc.text('Observaciones: ', ML, Y);
   doc.setFont('helvetica','normal');
-  doc.text(S.obsDrivers || 'Sin observaciones', ML+32, Y);
-  Y += 8;
+  doc.text(S.obsDrivers || 'Sin observaciones', ML+32, Y); Y += 8;
 
-  // 4. PERIFÉRICOS
+  // ── 4. PERIFÉRICOS ──
   secHeader('4. Verificación Física de Periféricos');
-
-  // Limpieza interna
   checkY(14);
   tbl(
     ['Campo','Resultado','Observaciones'],
@@ -811,12 +1060,12 @@ function generarPDF() {
     { 0:{ cellWidth:50 }, 1:{ cellWidth:40 }, 2:{ cellWidth:25 }, 3:{ cellWidth:25 } }
   );
 
-  // 5. RED
+  // ── 5. RED ──
   secHeader('5. Conectividad y Red');
   if (S.tarjetasRed.length > 0) {
     tbl(
       ['Nombre','Descripción','MAC','IP','Estado','Velocidad'],
-      S.tarjetasRed.map(function(t) { return [t.nombre||'', t.descripcion||'', t.mac||'', t.ip||'—', t.estado||'', t.velocidad||'']; }),
+      S.tarjetasRed.map(function(t){ return [t.nombre||'', t.descripcion||'', t.mac||'', t.ip||'—', t.estado||'', t.velocidad||'']; }),
       { 0:{ cellWidth:22 }, 1:{ cellWidth:50 }, 2:{ cellWidth:32 } }
     );
   } else {
@@ -831,20 +1080,25 @@ function generarPDF() {
   doc.setFont('helvetica','bold'); doc.setFontSize(8);
   doc.text('Ping 8.8.8.8: ', ML, Y);
   doc.setFont('helvetica','normal');
-  doc.text(pingTxt, ML+28, Y);
-  Y += 10;
+  doc.text(pingTxt, ML+28, Y); Y += 10;
 
-  // 6. FIRMAS
-  checkY(90);
+  // ── 6. FIRMAS ──
+  const hw      = (W - 6) / 2;
+  const ROW_H   = 13;
+  const SIG_H   = 55;   // zona de firma más grande para firma digital
+  const PAD_TOP = 10;
+  const PAD_BOT = 6;
+  const maxCampos   = 5;
+  const alturaBloque = PAD_TOP + maxCampos * ROW_H + SIG_H + PAD_BOT;
+
+  checkY(alturaBloque + 14);
   secHeader('6. Información de Entrega y Firmas');
 
-  const hw = (W - 6) / 2;
-
-  // Datos de las personas
   const personas = [
     {
       titulo: 'COLABORADOR RECEPTOR',
       x: ML,
+      firmaData: S.firmaColaborador,
       campos: [
         { label: 'Nombre completo', val: S.colNombre },
         { label: 'Cédula',          val: S.colCedula },
@@ -856,22 +1110,13 @@ function generarPDF() {
     {
       titulo: 'TÉCNICO RESPONSABLE',
       x: ML + hw + 6,
+      firmaData: S.firmaTecnico,
       campos: [
         { label: 'Nombre completo', val: S.tecNombre },
         { label: 'Cargo',           val: S.tecCargo },
       ]
     }
   ];
-
-  // Calcular altura del bloque más alto (colaborador tiene 5 campos)
-  const ROW_H   = 13;   // altura por fila de dato
-  const SIG_H   = 28;   // altura zona firma (firma + fecha + separación)
-  const PAD_TOP = 10;
-  const PAD_BOT = 6;
-  const maxCampos = 5;
-  const alturaBloque = PAD_TOP + maxCampos * ROW_H + SIG_H + PAD_BOT;
-
-  checkY(alturaBloque + 4);
 
   personas.forEach(function(p) {
     const bx = p.x;
@@ -894,47 +1139,68 @@ function generarPDF() {
     p.campos.forEach(function(f) {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(80, 80, 80);
       doc.text(f.label + ':', bx + 4, ry);
-
       if (f.val && f.val.trim() !== '') {
-        // Valor ingresado → mostrar texto
         doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(0, 0, 0);
         doc.text(f.val.trim(), bx + 4, ry + 5);
       } else {
-        // Sin valor → línea para llenado manual
         doc.setDrawColor(160, 160, 160); doc.setLineWidth(0.3);
         doc.line(bx + 4, ry + 5.5, bx + hw - 4, ry + 5.5);
       }
       ry += ROW_H;
     });
 
-    // Zona de firma — siempre al fondo del bloque con separación
+    // Zona de firma — fondo del bloque
     const sigZoneY = by + alturaBloque - SIG_H - PAD_BOT + 2;
 
     // Separador
     doc.setDrawColor(180, 180, 180); doc.setLineWidth(0.4);
     doc.line(bx + 4, sigZoneY, bx + hw - 4, sigZoneY);
 
-    // Firma
+    // Etiqueta firma
     doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(80, 80, 80);
-    doc.text('Firma:', bx + 4, sigZoneY + 8);
-    doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4);
-    doc.line(bx + 18, sigZoneY + 8, bx + hw - 4, sigZoneY + 8);
+    doc.text('Firma:', bx + 4, sigZoneY + 7);
+
+    const sigImgW = hw - 12;
+    const sigImgH = 38;
+    const sigImgX = bx + 4;
+    const sigImgY = sigZoneY + 10;
+
+    if (p.firmaData && p.firmaData.length > 100) {
+      // Insertar imagen de firma digital
+      try {
+        doc.addImage(p.firmaData, 'PNG', sigImgX, sigImgY, sigImgW, sigImgH);
+        // Borde alrededor de la imagen de firma
+        doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.2);
+        doc.rect(sigImgX, sigImgY, sigImgW, sigImgH);
+      } catch(err) {
+        // Fallback a línea
+        doc.setDrawColor(0,0,0); doc.setLineWidth(0.4);
+        doc.line(sigImgX, sigImgY + sigImgH, sigImgX + sigImgW, sigImgY + sigImgH);
+      }
+    } else {
+      // Sin firma digital — espacio en blanco con borde para firma manual
+      doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.2);
+      doc.rect(sigImgX, sigImgY, sigImgW, sigImgH);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(180, 180, 180);
+      doc.text('Espacio para firma', sigImgX + 2, sigImgY + sigImgH / 2);
+    }
 
     // Fecha
+    const fechaY = sigZoneY + 52;
     doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(80, 80, 80);
-    doc.text('Fecha:', bx + 4, sigZoneY + 18);
+    doc.text('Fecha:', bx + 4, fechaY);
     doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4);
-    doc.line(bx + 18, sigZoneY + 18, bx + hw - 4, sigZoneY + 18);
+    doc.line(bx + 18, fechaY, bx + hw - 4, fechaY);
   });
 
   Y += alturaBloque + 8;
 
-  // FOOTER
+  // ── FOOTER ──
   const total = doc.internal.getNumberOfPages();
   for (let i = 1; i <= total; i++) {
     doc.setPage(i);
     doc.setFont('helvetica','normal'); doc.setFontSize(6.5); doc.setTextColor(100,100,100);
-    doc.text('OTD Américas — Checklist Alistamiento Home Office — ' + hostname + ' — ' + fecha, ML, 290);
+    doc.text('OTD Américas — ' + tipo.titulo + ' — ' + hostname + ' — ' + fecha, ML, 290);
     doc.text('Pág. ' + i + ' de ' + total, PW-MR-16, 290);
     doc.setDrawColor(180,180,180); doc.setLineWidth(0.2);
     doc.line(ML, 287, PW-MR, 287);
