@@ -85,6 +85,12 @@ header p  { font-size: 11px; color: #555; margin-top: 2px; }
 }
 .sel-actions button:hover { border-color: #111; background: #f5f5f5; }
 .sel-badge { font-size: 10px; font-weight: 700; background: #111; color: #fff; padding: 2px 8px; margin-left: 8px; }
+.btn-campana {
+  font-size: 11px; font-family: inherit; padding: 3px 10px;
+  border: 1.5px solid #3a5fc8; background: #f0f4ff; color: #3a5fc8;
+  cursor: pointer; transition: all .15s; font-weight: 700;
+}
+.btn-campana:hover { background: #3a5fc8 !important; color: #fff !important; border-color: #3a5fc8 !important; }
 
 .radios { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .radios button {
@@ -168,6 +174,7 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
     <select id="tipo-checklist" onchange="actualizarTipoChecklist(this.value)">
       <option value="alistamiento">Alistamiento Entrega de equipo Home Office</option>
       <option value="pazsalvo">Paz y Salvo (Entrega de equipo)</option>
+      <option value="inventario">Inventario (Certificación)</option>
     </select>
     <span id="tipo-desc">Validación técnica de equipos para trabajo remoto · Laptops y equipos de escritorio</span>
   </div>
@@ -250,10 +257,13 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
       <span class="lbl-sub">Programas Instalados</span>
       <p class="note">Marca los programas que deseas incluir en el reporte exportado. Si no seleccionas ninguno, no se exportará ninguno.</p>
       <input type="text" class="search-box" id="search-programas" placeholder="🔍 Buscar por programa o editor..." oninput="filtrarProgramas(this.value)"/>
-      <div class="sel-actions">
+      <div class="sel-actions" id="sel-actions-programas">
         <span>Seleccionar:</span>
         <button onclick="seleccionarTodosProgramas(true)">Todos</button>
         <button onclick="seleccionarTodosProgramas(false)">Ninguno</button>
+        <span id="campana-btns-sep" style="color:#bbb;margin:0 2px;">|</span>
+        <span style="font-size:11px;color:#555;">Campaña:</span>
+        <!-- Los botones de campaña se generan dinámicamente en JS -->
         <span class="sel-badge" id="badge-programas">0 sel.</span>
       </div>
       <div style="max-height:220px; overflow-y:auto; border:1px solid #e0e0e0;">
@@ -429,7 +439,48 @@ const TIPOS_CHECKLIST = {
     titulo:    'CHECKLIST — PAZ Y SALVO (ENTREGA DE EQUIPO)',
     subtitulo: 'OTD Américas · Certificación de entrega y devolución de equipo de cómputo',
     desc:      'Certificación de entrega y devolución de equipo de cómputo · Laptops y equipos de escritorio'
+  },
+  inventario: {
+    titulo:    'INVENTARIO — CERTIFICACIÓN DE EQUIPO',
+    subtitulo: 'OTD Américas · Certificación y registro de inventario de equipos de cómputo',
+    desc:      'Certificación y registro de inventario de equipos · Laptops y equipos de escritorio'
   }
+};
+
+// ── DRIVERS REQUERIDOS (auto-selección al cargar JSON) ──
+// Cada entrada usa "palabras" que deben aparecer en el NOMBRE del driver (campo "nombre").
+// Se busca que TODAS las palabras de la entrada estén presentes (AND), no solo una.
+// Esto evita falsos positivos por términos genéricos como "hid" o "audio".
+const DRIVERS_REQUERIDOS = [
+  // Realtek PCIe GbE Family Controller — coincide por nombre exacto
+  { label: 'Red (Realtek GbE)',   palabras: ['realtek', 'gbe'] },
+  // Intel UHD Graphics / cualquier driver de video que contenga "graphics"
+  { label: 'Video (Graphics)',    palabras: ['graphics'] },
+  // Realtek High Definition Audio
+  { label: 'Audio (Realtek HDA)', palabras: ['realtek', 'audio'] },
+  // HID-compliant mouse — cualquier nombre que contenga "mouse"
+  { label: 'Mouse',               palabras: ['mouse'] },
+  // HID Keyboard Device — cualquier nombre que contenga "keyboard"
+  { label: 'Teclado',             palabras: ['keyboard'] },
+];
+
+// ── CAMPAÑAS — programas requeridos por campaña ──
+// Coincidencia parcial, sin distinguir mayúsculas/minúsculas
+const CAMPANAS = {
+  'Metro': [
+    'Agent Notification',
+    'Sentinel Agent',
+    'Microsoft Edge',
+    'Google Chrome',
+    'PDQConnectAgent',
+    'PDQConnectUpdater',
+    'Avaya Agent',
+    'Citrix Workspace',
+    'Sanas',
+    'Citrix Secure Access',
+  ],
+  // Agrega más campañas aquí con el mismo formato:
+  // 'NombreCampaña': ['App1', 'App2', ...],
 };
 
 function actualizarTipoChecklist(val) {
@@ -597,6 +648,65 @@ function seleccionarTodosDrivers(todos) {
   renderDriversTable(S.drivers);
 }
 
+// ── BOTONES DE CAMPAÑA ──
+function generarBotonesCampana() {
+  const bar = document.getElementById('sel-actions-programas');
+  if (!bar) return;
+  // Eliminar botones de campaña previos
+  bar.querySelectorAll('.btn-campana').forEach(function(b){ b.remove(); });
+  const sep = document.getElementById('campana-btns-sep');
+  const badge = document.getElementById('badge-programas');
+  Object.keys(CAMPANAS).forEach(function(nombre) {
+    const btn = document.createElement('button');
+    btn.textContent = nombre;
+    btn.className = 'btn-campana';
+    btn.title = 'Marcar programas de campaña ' + nombre;
+    btn.onclick = function(){ seleccionarCampana(nombre); };
+    bar.insertBefore(btn, badge);
+  });
+}
+
+function seleccionarCampana(nombre) {
+  const lista = CAMPANAS[nombre];
+  if (!lista) return;
+
+  // Limpiar selección previa
+  S.programasSeleccionados.clear();
+
+  const faltanApps = [];
+  lista.forEach(function(appReq) {
+    const reqLC = appReq.toLowerCase();
+    let encontrado = false;
+    S.programas.forEach(function(p, idx) {
+      if ((p.nombre || '').toLowerCase().includes(reqLC)) {
+        S.programasSeleccionados.add(idx);
+        encontrado = true;
+      }
+    });
+    if (!encontrado) faltanApps.push(appReq);
+  });
+
+  // Actualizar estado y UI de "¿Cumple aplicativos?"
+  if (faltanApps.length === 0) {
+    S.appsCumple = 'Sí';
+    autoMark('radios-appsCumple', 'Sí');
+    S.obsApps = '';
+    const el = document.getElementById('obs-apps');
+    if (el) el.value = '';
+    toast('✓ Campaña ' + nombre + ': todos los aplicativos encontrados');
+  } else {
+    S.appsCumple = 'Parcialmente';
+    autoMark('radios-appsCumple', 'Parcialmente');
+    const obs = 'Aplicativos no encontrados: ' + faltanApps.join(', ');
+    S.obsApps = obs;
+    const el = document.getElementById('obs-apps');
+    if (el) el.value = obs;
+    toast('⚠ Campaña ' + nombre + ': faltan ' + faltanApps.length + ' aplicativo(s)');
+  }
+
+  renderProgramasTable(S.programas);
+}
+
 // ── CANVAS FIRMA ──
 function initCanvas(canvasId, stateKey) {
   const canvas = document.getElementById(canvasId);
@@ -681,6 +791,7 @@ window.onload = function() {
 
   renderPerifericos();
   renderCables();
+  generarBotonesCampana();
 
   initCanvas('canvas-firma-col', 'firmaColaborador');
   initCanvas('canvas-firma-tec', 'firmaTecnico');
@@ -759,6 +870,43 @@ function importJSON(text, fname) {
     if (Array.isArray(d.drivers)) {
       S.drivers = d.drivers;
       S.driversSeleccionados.clear();
+
+      // ── AUTO-SELECCIÓN DE DRIVERS REQUERIDOS ──
+      // Para cada driver requerido, busca drivers cuyo NOMBRE contenga
+      // TODAS las palabras clave definidas (coincidencia AND, sin importar mayúsculas).
+      // Solo se usa el campo "nombre" para evitar falsos positivos por clase genérica.
+      const faltanDrivers = [];
+      DRIVERS_REQUERIDOS.forEach(function(req) {
+        var encontrado = false;
+        S.drivers.forEach(function(dr, idx) {
+          const nombreLC = (dr.nombre || '').toLowerCase();
+          const coincide = req.palabras.every(function(p) {
+            return nombreLC.includes(p);
+          });
+          if (coincide) {
+            S.driversSeleccionados.add(idx);
+            encontrado = true;
+          }
+        });
+        if (!encontrado) faltanDrivers.push(req.label);
+      });
+
+      // Actualizar estado y UI de "¿Cumple drivers?"
+      if (faltanDrivers.length === 0) {
+        S.driversCumple = 'Sí';
+        autoMark('radios-driversCumple', 'Sí');
+        S.obsDrivers = '';
+        const el = document.getElementById('obs-drivers');
+        if (el) el.value = '';
+      } else {
+        S.driversCumple = 'Parcialmente';
+        autoMark('radios-driversCumple', 'Parcialmente');
+        const obs = 'Drivers no encontrados: ' + faltanDrivers.join(', ');
+        S.obsDrivers = obs;
+        const el = document.getElementById('obs-drivers');
+        if (el) el.value = obs;
+      }
+
       renderDriversTable(S.drivers);
     }
 
