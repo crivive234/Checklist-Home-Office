@@ -448,20 +448,21 @@ const TIPOS_CHECKLIST = {
 };
 
 // ── DRIVERS REQUERIDOS (auto-selección al cargar JSON) ──
-// Cada entrada usa "palabras" que deben aparecer en el NOMBRE del driver (campo "nombre").
-// Se busca que TODAS las palabras de la entrada estén presentes (AND), no solo una.
-// Esto evita falsos positivos por términos genéricos como "hid" o "audio".
+// Cada entrada define:
+//   palabras  → todas deben estar en el nombre (AND, sin case)
+//   clase     → si se define, la clase del driver también debe coincidir (AND)
+//   excluir   → si alguna de estas palabras está en el nombre, se descarta el driver
 const DRIVERS_REQUERIDOS = [
-  // Realtek PCIe GbE Family Controller — coincide por nombre exacto
-  { label: 'Red (Realtek GbE)',   palabras: ['realtek', 'gbe'] },
-  // Intel UHD Graphics / cualquier driver de video que contenga "graphics"
-  { label: 'Video (Graphics)',    palabras: ['graphics'] },
+  // Red: clase NET + nombre contiene "pcie" — selecciona TODOS los que coincidan
+  { label: 'Red (PCIe)',          palabras: ['pcie'],              clase: 'net',     excluir: [] },
+  // Video: SOLO clase DISPLAY, excluyendo Command Center y Control Panel
+  { label: 'Video (Graphics)',    palabras: ['graphics'],          clase: 'display', excluir: ['command center', 'control panel'] },
   // Realtek High Definition Audio
-  { label: 'Audio (Realtek HDA)', palabras: ['realtek', 'audio'] },
+  { label: 'Audio (Realtek HDA)', palabras: ['realtek', 'audio'], clase: '',        excluir: [] },
   // HID-compliant mouse — cualquier nombre que contenga "mouse"
-  { label: 'Mouse',               palabras: ['mouse'] },
+  { label: 'Mouse',               palabras: ['mouse'],             clase: '',        excluir: [] },
   // HID Keyboard Device — cualquier nombre que contenga "keyboard"
-  { label: 'Teclado',             palabras: ['keyboard'] },
+  { label: 'Teclado',             palabras: ['keyboard'],          clase: '',        excluir: [] },
 ];
 
 // ── CAMPAÑAS — programas requeridos por campaña ──
@@ -872,17 +873,31 @@ function importJSON(text, fname) {
       S.driversSeleccionados.clear();
 
       // ── AUTO-SELECCIÓN DE DRIVERS REQUERIDOS ──
-      // Para cada driver requerido, busca drivers cuyo NOMBRE contenga
-      // TODAS las palabras clave definidas (coincidencia AND, sin importar mayúsculas).
-      // Solo se usa el campo "nombre" para evitar falsos positivos por clase genérica.
+      // Reglas por entrada en DRIVERS_REQUERIDOS:
+      //   palabras → TODAS deben estar en el nombre (AND, sin case)
+      //   clase    → si está definida, la clase del driver debe coincidir exactamente (sin case)
+      //   excluir  → si ALGUNA de estas cadenas está en el nombre, el driver se descarta
       const faltanDrivers = [];
       DRIVERS_REQUERIDOS.forEach(function(req) {
         var encontrado = false;
         S.drivers.forEach(function(dr, idx) {
           const nombreLC = (dr.nombre || '').toLowerCase();
-          const coincide = req.palabras.every(function(p) {
-            return nombreLC.includes(p);
+          const claseLC  = (dr.clase  || '').toLowerCase();
+
+          // Filtro por clase (si está definida en la regla)
+          if (req.clase && claseLC !== req.clase.toLowerCase()) return;
+
+          // Filtro de exclusión: si el nombre contiene alguna cadena excluida, descartar
+          const excluido = (req.excluir || []).some(function(e) {
+            return nombreLC.includes(e.toLowerCase());
           });
+          if (excluido) return;
+
+          // Todas las palabras clave deben estar en el nombre
+          const coincide = req.palabras.every(function(p) {
+            return nombreLC.includes(p.toLowerCase());
+          });
+
           if (coincide) {
             S.driversSeleccionados.add(idx);
             encontrado = true;
