@@ -155,6 +155,18 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
 
 .perf-obs { width: 100%; border: 1px solid #ddd; padding: 4px 7px; font-size: 11px; font-family: inherit; outline: none; background: #fff; }
 .perf-obs:focus { border-color: #111; }
+
+/* ── TOGGLE PANTALLAS ── */
+.pantallas-toggle { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.pantallas-toggle span { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#555; }
+.btn-pantalla {
+  font-size:12px; font-family:inherit; font-weight:700; padding:6px 18px;
+  border:1.5px solid #bbb; background:#fff; color:#555; cursor:pointer; transition:all .15s; letter-spacing:.5px;
+}
+.btn-pantalla:hover { border-color:#111; color:#111; }
+.btn-pantalla.activo { background:#111; color:#fff; border-color:#111; }
+tr.row-segunda-pantalla td { opacity:.35; pointer-events:none; transition:opacity .2s; }
+tr.row-segunda-pantalla.activa td { opacity:1; pointer-events:auto; }
 </style>
 </head>
 <body>
@@ -352,6 +364,14 @@ hr { border: none; border-top: 1px solid #e0e0e0; margin: 16px 0; }
       <p class="note" style="margin-bottom:8px;">
         Usa <strong>N/A</strong> (No Aplica) para periféricos que no correspondan al tipo de equipo (ej: monitor, teclado o mouse externo en laptops).
       </p>
+
+      <!-- Toggle 1 / 2 pantallas -->
+      <div class="pantallas-toggle">
+        <span>Configuración de pantallas:</span>
+        <button class="btn-pantalla activo" id="btn-1pantalla" onclick="setPantallas(1)">⬜ 1 Pantalla</button>
+        <button class="btn-pantalla"        id="btn-2pantallas" onclick="setPantallas(2)">⬜⬜ 2 Pantallas</button>
+      </div>
+
       <hr/>
       <span class="lbl-sub">Periféricos</span>
       <table id="tbl-perifericos" style="margin-bottom:16px;">
@@ -513,23 +533,29 @@ const S = {
 };
 
 const PERIFERICOS = [
-  { key:'teclado',  label:'Teclado' },
-  { key:'mouse',    label:'Mouse' },
-  { key:'monitor',  label:'Monitor' },
-  { key:'camara',   label:'Cámara Web' },
-  { key:'diadema',  label:'Diadema / Headset' },
-  { key:'yubikey',  label:'YubiKey' },
+  { key:'teclado',   label:'Teclado' },
+  { key:'mouse',     label:'Mouse' },
+  { key:'monitor',   label:'Monitor' },
+  { key:'monitor2',  label:'Monitor 2ª Pantalla', segunda:true },
+  { key:'camara',    label:'Cámara Web' },
+  { key:'diadema',   label:'Diadema / Headset' },
+  { key:'yubikey',   label:'YubiKey' },
 ];
 
 const TIPOS_VIDEO = ['DisplayPort a VGA','HDMI a VGA','VGA','HDMI','DisplayPort'];
 const TIPOS_UTP   = ['Cat 5','Cat 5e','Cat 6','Cat 6e'];
 
 const CABLES = [
-  { key:'video',    label:'Cable de Video',      tipoSelect:'video', funciona:true },
-  { key:'red',      label:'Cable de Red (UTP)',  tipoSelect:'utp',   funciona:true },
-  { key:'powerpc',  label:'Cable Poder Equipo',  tipoSelect:false,   funciona:true },
-  { key:'powermon', label:'Cable Poder Monitor', tipoSelect:false,   funciona:true },
+  { key:'video',     label:'Cable de Video',              tipoSelect:'video', funciona:true },
+  { key:'video2',    label:'Cable de Video 2ª Pantalla',  tipoSelect:'video', funciona:true, segunda:true },
+  { key:'red',       label:'Cable de Red (UTP)',          tipoSelect:'utp',   funciona:true },
+  { key:'powerpc',   label:'Cable Poder Equipo',          tipoSelect:false,   funciona:true },
+  { key:'powermon',  label:'Cable Poder Monitor',         tipoSelect:false,   funciona:true },
+  { key:'powermon2', label:'Cable Poder Monitor 2ª Pantalla', tipoSelect:false, funciona:true, segunda:true },
 ];
+
+// Estado de doble pantalla (false = 1 pantalla por defecto)
+var dualMonitor = false;
 
 // ── HELPERS RADIOS CON N/A ──
 function makeRadios(key, obj, field, values) {
@@ -544,11 +570,27 @@ function makeRadios(key, obj, field, values) {
   '</div>';
 }
 
+// ── TOGGLE PANTALLAS ──
+function setPantallas(n) {
+  dualMonitor = (n === 2);
+  document.getElementById('btn-1pantalla').classList.toggle('activo', !dualMonitor);
+  document.getElementById('btn-2pantallas').classList.toggle('activo', dualMonitor);
+  // Activar/desactivar filas de segunda pantalla
+  document.querySelectorAll('.row-segunda-pantalla').forEach(function(tr) {
+    tr.classList.toggle('activa', dualMonitor);
+  });
+}
+
 // ── RENDER PERIFÉRICOS ──
 function renderPerifericos() {
   document.querySelector('#tbl-perifericos tbody').innerHTML = PERIFERICOS.map(function(p) {
-    return '<tr>' +
-      '<td style="font-weight:600;white-space:nowrap;">' + p.label + '</td>' +
+    const esSegunda = !!p.segunda;
+    const trClass = esSegunda ? 'class="row-segunda-pantalla' + (dualMonitor ? ' activa' : '') + '"' : '';
+    const labelCell = esSegunda
+      ? p.label + ' <span style="font-size:10px;color:#3a5fc8;font-weight:400;">(2ª pantalla)</span>'
+      : p.label;
+    return '<tr ' + trClass + '>' +
+      '<td style="font-weight:600;white-space:nowrap;">' + labelCell + '</td>' +
       '<td>' + makeRadios(p.key, 'perifericos', 'funciona', ['Sí','No','N/A']) + '</td>' +
       '<td><input type="text" class="perf-obs" placeholder="Sin observaciones" oninput="S.perifericos[\'' + p.key + '\'].obs=this.value"/></td>' +
     '</tr>';
@@ -558,6 +600,11 @@ function renderPerifericos() {
 // ── RENDER CABLES ──
 function renderCables() {
   document.querySelector('#tbl-cables tbody').innerHTML = CABLES.map(function(c) {
+    const esSegunda = !!c.segunda;
+    const trClass = esSegunda ? 'class="row-segunda-pantalla' + (dualMonitor ? ' activa' : '') + '"' : '';
+    const labelCell = esSegunda
+      ? c.label + ' <span style="font-size:10px;color:#3a5fc8;font-weight:400;">(2ª pantalla)</span>'
+      : c.label;
     let tipoCell = '';
     if (c.tipoSelect === 'video') {
       tipoCell = '<select onchange="S.cables[\'' + c.key + '\'].tipo=this.value"><option value="">— Seleccionar —</option>' +
@@ -568,8 +615,8 @@ function renderCables() {
     } else {
       tipoCell = '<span style="color:#aaa;font-size:11px;">N/A</span>';
     }
-    return '<tr>' +
-      '<td style="font-weight:600;white-space:nowrap;">' + c.label + '</td>' +
+    return '<tr ' + trClass + '>' +
+      '<td style="font-weight:600;white-space:nowrap;">' + labelCell + '</td>' +
       '<td>' + tipoCell + '</td>' +
       '<td>' + makeRadios(c.key, 'cables', 'tiene',    ['Sí','No','N/A']) + '</td>' +
       '<td>' + makeRadios(c.key, 'cables', 'funciona', ['Sí','No','N/A']) + '</td>' +
@@ -1204,7 +1251,7 @@ function generarPDF() {
 
   tbl(
     ['Periférico','¿Funciona?','Observación'],
-    PERIFERICOS.map(function(p) {
+    PERIFERICOS.filter(function(p){ return !p.segunda || dualMonitor; }).map(function(p) {
       const d = S.perifericos[p.key] || {};
       return [p.label, d.funciona||'—', d.obs || 'Sin observaciones'];
     }),
@@ -1216,7 +1263,7 @@ function generarPDF() {
   doc.text('Cables', ML, Y); Y += 5;
   tbl(
     ['Cable','Tipo / Modelo','¿Incluido?','¿Funciona?'],
-    CABLES.map(function(c) {
+    CABLES.filter(function(c){ return !c.segunda || dualMonitor; }).map(function(c) {
       const d = S.cables[c.key] || {};
       return [c.label, d.tipo||(c.tipoSelect?'—':'N/A'), d.tiene||'—', d.funciona||'—'];
     }),
