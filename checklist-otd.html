@@ -406,7 +406,7 @@ tr.row-segunda-pantalla.activa td { opacity:1; pointer-events:auto; }
   </div>
 
   <!-- 5. INFORMACIÓN DE ENTREGA Y FIRMAS -->
-  <div class="section">
+  <div class="section" id="section-firmas">
     <div class="section-title">5. Información de Entrega y Firmas</div>
     <div class="section-body">
       <p class="note" style="margin-bottom:16px;">Complete los datos antes de generar el PDF. Los campos con información aparecerán impresos; los vacíos quedarán como líneas para firma manual. Puede firmar digitalmente en el área de firma o dejarla en blanco para firmar el documento impreso.</p>
@@ -510,6 +510,12 @@ function actualizarTipoChecklist(val) {
   document.getElementById('header-title').textContent = t.titulo;
   document.getElementById('header-desc').textContent  = t.subtitulo;
   document.getElementById('tipo-desc').textContent    = t.desc;
+
+  // Ocultar sección de firmas para "Inventario (Certificación)"
+  const secFirmas = document.getElementById('section-firmas');
+  if (secFirmas) {
+    secFirmas.style.display = (val === 'inventario') ? 'none' : '';
+  }
 }
 
 // ── ESTADO ──
@@ -1292,7 +1298,8 @@ function generarPDF() {
   doc.setFont('helvetica','normal');
   doc.text(pingTxt, ML+28, Y); Y += 10;
 
-  // ── 6. FIRMAS ──
+  // ── 6. FIRMAS ── (se omite en "Inventario Certificación")
+  if (S.tipoChecklist !== 'inventario') {
   const hw      = (W - 6) / 2;
   const ROW_H   = 13;
   const SIG_H   = 55;   // zona de firma más grande para firma digital
@@ -1404,6 +1411,7 @@ function generarPDF() {
   });
 
   Y += alturaBloque + 8;
+  } // fin if tipoChecklist !== 'inventario'
 
   // ── FOOTER ──
   const total = doc.internal.getNumberOfPages();
